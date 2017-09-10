@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<log>
+    <logentry
+	revision="21955">
+	<author>johnc</author>
+	<date>2003-06-07T12:04:04.132787Z</date>
+	<paths>
+	    <path action="M" kind="file">/trunk/quake/src/Quake.h</path>
+	    <path
+		action="M"
+		kind="file">/trunk/quake/src/Quake.c</path>
+	</paths>
+	<msg>
+	    Improve docs
+	    Alignment fixes
+	</msg>
+    </logentry>
+</log>
