@@ -15,6 +15,7 @@
  */
 package com.ervacon.svn.logstats;
 
+import static java.time.format.DateTimeFormatter.ISO_DATE;
 import static java.util.Objects.requireNonNull;
 
 import com.ervacon.svn.logstats.Util.KeyValuePair;
@@ -60,6 +61,8 @@ public class HtmlReportWriter {
 			writeCommitsPerHour(out);
 			writeFileTypesInCommits(out, 20);
 			writeAvgMessageLength(out);
+			writeCommitsPerAuthorWithNoMessage(out);
+			// top adders, removers, modifyers
 
 			out.println("<h2>Author statistics</h2>");
 			for (String author : aggregator.getAuthors()) {
@@ -69,8 +72,9 @@ public class HtmlReportWriter {
 				out.println("<a id='" + stats.author + "'/>");
 				out.println("<h3>" + stats.author + "</h3>");
 
-				out.println("<p>Author " + stats.author + " was active between " + stats.firstCommit
-						+ " and " + stats.lastCommit + ", and performed " + stats.commits + " commits.</p>");
+				out.println("<p>Author " + stats.author + " was active between " + stats.firstCommit.format(ISO_DATE)
+						+ " and " + stats.lastCommit.format(ISO_DATE) + ", and performed <b>"
+						+ stats.commits + "</b> commits.</p>");
 
 				writeCommitsPerHour(out, stats);
 				writeFileTypesInCommits(out, stats, 10);
@@ -141,6 +145,13 @@ public class HtmlReportWriter {
 		aggregator.getStats().forEach(stats -> data.add(new KeyValuePair(stats.author, stats.getAverageMessageLength())));
 		data.sort(KeyValuePair::orderByValueDesc);
 		writeChart(out, "Average commit message length per author", data);
+	}
+
+	private void writeCommitsPerAuthorWithNoMessage(PrintWriter out) throws IOException {
+		List<KeyValuePair> data = new ArrayList<>();
+		aggregator.getStats().forEach(stats -> data.add(new KeyValuePair(stats.author, stats.emptyMsgs)));
+		data.sort(KeyValuePair::orderByValueDesc);
+		writeChart(out, "Empty commit messages per author", data);
 	}
 
 	private void writeChart(PrintWriter out, String title, List<KeyValuePair> data) throws IOException {

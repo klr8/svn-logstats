@@ -19,6 +19,8 @@ import static java.lang.Integer.parseInt;
 import static java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME;
 import static java.util.Objects.requireNonNull;
 
+import com.ervacon.svn.logstats.SvnLogEntryPath.PathAction;
+import com.ervacon.svn.logstats.SvnLogEntryPath.PathKind;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -117,8 +119,8 @@ public class SvnLogParser {
 
 						case "path":
 							logEntryPath = new SvnLogEntryPath();
-							logEntryPath.action = startEl.getAttributeByName(new QName("action")).getValue();
-							logEntryPath.kind = startEl.getAttributeByName(new QName("kind")).getValue();
+							logEntryPath.action = PathAction.valueOf(startEl.getAttributeByName(new QName("action")).getValue());
+							logEntryPath.kind = PathKind.valueOf(startEl.getAttributeByName(new QName("kind")).getValue().toUpperCase());
 							buf = new StringBuilder();
 							break;
 					}

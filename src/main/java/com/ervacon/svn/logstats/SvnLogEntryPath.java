@@ -22,8 +22,15 @@ package com.ervacon.svn.logstats;
  */
 public class SvnLogEntryPath {
 
-	public String action;
-	public String kind;
+	public PathAction action;
+	public PathKind kind;
 	public String path;
 
+	public static enum PathAction {
+		M, D, A, R
+	}
+
+	public static enum PathKind {
+		FILE, DIR
+	}
 }

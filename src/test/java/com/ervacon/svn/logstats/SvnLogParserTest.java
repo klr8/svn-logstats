@@ -17,6 +17,8 @@ package com.ervacon.svn.logstats;
 
 import static org.junit.Assert.assertEquals;
 
+import com.ervacon.svn.logstats.SvnLogEntryPath.PathAction;
+import com.ervacon.svn.logstats.SvnLogEntryPath.PathKind;
 import java.io.Reader;
 import java.io.StringReader;
 import java.time.temporal.ChronoField;
@@ -44,11 +46,11 @@ public class SvnLogParserTest {
 		assertEquals(4, entry.date.get(ChronoField.SECOND_OF_MINUTE));
 		assertEquals(132787000, entry.date.get(ChronoField.NANO_OF_SECOND));
 		assertEquals(2, entry.paths.size());
-		assertEquals("M", entry.paths.get(0).action);
-		assertEquals("file", entry.paths.get(0).kind);
+		assertEquals(PathAction.M, entry.paths.get(0).action);
+		assertEquals(PathKind.FILE, entry.paths.get(0).kind);
 		assertEquals("/trunk/quake/src/Quake.h", entry.paths.get(0).path);
-		assertEquals("M", entry.paths.get(1).action);
-		assertEquals("file", entry.paths.get(1).kind);
+		assertEquals(PathAction.M, entry.paths.get(1).action);
+		assertEquals(PathKind.FILE, entry.paths.get(1).kind);
 		assertEquals("/trunk/quake/src/Quake.c", entry.paths.get(1).path);
 		assertEquals("Improve docs\n	    Alignment fixes", entry.msg);
 	}
