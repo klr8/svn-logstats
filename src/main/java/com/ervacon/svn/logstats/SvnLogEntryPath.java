@@ -27,7 +27,10 @@ public class SvnLogEntryPath {
 	public String path;
 
 	public static enum PathAction {
-		M, D, A, R
+		M, // modified
+		D, // deleted
+		A, // added
+		R // replaced
 	}
 
 	public static enum PathKind {

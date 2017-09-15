@@ -5,7 +5,7 @@
 	<author>johnc</author>
 	<date>2003-06-07T12:04:04.132787Z</date>
 	<paths>
-	    <path action="M" kind="file">/trunk/quake/src/Quake.h</path>
+	    <path action="A" kind="file">/trunk/quake/src/Quake.h</path>
 	    <path
 		action="M"
 		kind="file">/trunk/quake/src/Quake.c</path>

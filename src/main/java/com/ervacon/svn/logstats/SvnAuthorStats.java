@@ -15,8 +15,8 @@
  */
 package com.ervacon.svn.logstats;
 
+import com.ervacon.svn.logstats.SvnLogEntryPath.PathAction;
 import static com.ervacon.svn.logstats.Util.getFilenameExtension;
-
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoField;
 import java.util.HashMap;
@@ -39,6 +39,7 @@ public class SvnAuthorStats {
 	public int msgLength = 0;
 	public ZonedDateTime firstCommit;
 	public ZonedDateTime lastCommit;
+	public Map<PathAction, Integer> actionCounts = new HashMap<>();
 
 	public SvnAuthorStats(String author) {
 		this.author = Objects.requireNonNull(author);
@@ -47,7 +48,9 @@ public class SvnAuthorStats {
 	public void updateWith(SvnLogEntry logEntry) {
 		commits++;
 		commitsPerHour[logEntry.date.get(ChronoField.HOUR_OF_DAY)]++;
+
 		pathsInCommits += logEntry.paths.size();
+
 		Set<String> extensionsInCommit = new HashSet<>();
 		logEntry.paths.forEach(path -> {
 			String extension = getFilenameExtension(path.path);
@@ -57,11 +60,15 @@ public class SvnAuthorStats {
 			extensionsInCommit.add(extension);
 		});
 		extensionsInCommit.forEach(extension -> fileTypesInCommits.compute(extension, (k, v) -> v == null ? 1 : v + 1));
+
+		logEntry.paths.forEach(path -> actionCounts.compute(path.action, (k, v) -> v == null ? 1 : v + 1));
+
 		if (logEntry.msg == null || logEntry.msg.trim().length() == 0) {
 			emptyMsgs++;
 		} else {
 			msgLength += logEntry.msg.length();
 		}
+
 		if (firstCommit == null || firstCommit.isAfter(logEntry.date)) {
 			firstCommit = logEntry.date;
 		}
@@ -76,6 +83,10 @@ public class SvnAuthorStats {
 
 	public int getAverageMessageLength() {
 		return msgLength / commits;
+	}
+
+	public int getActionCount(PathAction action) {
+		return actionCounts.getOrDefault(action, 0);
 	}
 
 	public static int sortByAuthorNameAsc(SvnAuthorStats stats1, SvnAuthorStats stats2) {
