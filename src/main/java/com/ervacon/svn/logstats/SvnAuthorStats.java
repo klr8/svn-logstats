@@ -15,23 +15,61 @@
  */
 package com.ervacon.svn.logstats;
 
+import static com.ervacon.svn.logstats.Util.getFilenameExtension;
+
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoField;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
+/**
+ * Aggregated statistics for a specific author found in the Subversion log.
+ */
 public class SvnAuthorStats {
 
-	public String author;
-	public int commits;
-	public int pathsInCommits;
+	public final String author;
+	public int commits = 0;
+	public int[] commitsPerHour = new int[24];
+	public int pathsInCommits = 0;
+	public Map<String, Integer> fileTypesInCommits = new HashMap<>();
+	public int msgLength = 0;
+	public ZonedDateTime firstCommit;
+	public ZonedDateTime lastCommit;
 
 	public SvnAuthorStats(String author) {
 		this.author = Objects.requireNonNull(author);
+	}
+
+	public void updateWith(SvnLogEntry logEntry) {
+		commits++;
+		commitsPerHour[logEntry.date.get(ChronoField.HOUR_OF_DAY)]++;
+		pathsInCommits += logEntry.paths.size();
+		logEntry.paths.forEach(path -> {
+			String extension = getFilenameExtension(path.path);
+			if (extension == null) {
+				extension = "other";
+			}
+			fileTypesInCommits.compute(extension, (k, v) -> v == null ? 1 : v + 1);
+		});
+		msgLength += logEntry.msg != null ? logEntry.msg.trim().length() : 0L;
+		if (firstCommit == null || firstCommit.isAfter(logEntry.date)) {
+			firstCommit = logEntry.date;
+		}
+		if (lastCommit == null || lastCommit.isBefore(logEntry.date)) {
+			lastCommit = logEntry.date;
+		}
 	}
 
 	public int getAverageCommitSize() {
 		return pathsInCommits / commits;
 	}
 
-	public static int orderByCommitsDesc(SvnAuthorStats stats1, SvnAuthorStats stats2) {
-		return stats2.commits - stats1.commits;
+	public int getAverageMessageLength() {
+		return msgLength / commits;
+	}
+
+	public static int sortByAuthorNameAsc(SvnAuthorStats stats1, SvnAuthorStats stats2) {
+		return stats1.author.compareTo(stats2.author);
 	}
 }

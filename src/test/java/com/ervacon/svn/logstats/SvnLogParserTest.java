@@ -15,11 +15,12 @@
  */
 package com.ervacon.svn.logstats;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.Reader;
 import java.io.StringReader;
 import java.time.temporal.ChronoField;
 import javax.xml.stream.XMLStreamException;
-import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 public class SvnLogParserTest {

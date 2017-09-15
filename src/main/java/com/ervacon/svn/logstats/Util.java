@@ -35,4 +35,30 @@ public final class Util {
 			return bin.lines().collect(Collectors.joining("\n"));
 		}
 	}
+
+	public static String getFilenameExtension(String path) {
+		int idx = path.lastIndexOf('.');
+		if (idx == -1) {
+			return null;
+		}
+		return path.substring(idx + 1);
+	}
+
+	/**
+	 * Simple key-value pair.
+	 */
+	public static class KeyValuePair {
+
+		public String key;
+		public int value;
+
+		public KeyValuePair(String key, int value) {
+			this.key = key;
+			this.value = value;
+		}
+
+		public static int orderByValueDesc(KeyValuePair kv1, KeyValuePair kv2) {
+			return kv2.value - kv1.value;
+		}
+	}
 }

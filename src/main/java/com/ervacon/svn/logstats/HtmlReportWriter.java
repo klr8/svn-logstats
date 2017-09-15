@@ -15,10 +15,16 @@
  */
 package com.ervacon.svn.logstats;
 
+import static java.util.Objects.requireNonNull;
+
+import com.ervacon.svn.logstats.Util.KeyValuePair;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import static java.util.Objects.requireNonNull;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Writes the statistics calculated by a {@link SvnLogEntryAggregator} to an HTML report file.
@@ -48,20 +54,104 @@ public class HtmlReportWriter {
 			out.println("<body>");
 			out.println("<h1>Subversion Commit Statistics</h1>");
 
-			out.println("<h2>Commit counts</h2>");
-			out.println("<div class='chart'>");
-			int mostCommits = aggregator.getMostCommits();
-			for (String author : aggregator.getAuthors(SvnAuthorStats::orderByCommitsDesc)) {
-				SvnAuthorStats stats = aggregator.getStatsFor(author);
-				int value = ((500 * stats.commits) / mostCommits);
-				out.println("<div style='width: " + value + "px;'>" + author + "</div>");
-			}
+			out.println("<h2>Global statistics</h2>");
+			writeCommitsPerAuthor(out);
+			writeAvgCommitSizePerAuthor(out);
+			writeCommitsPerHour(out);
+			writeFileTypesInCommits(out, 20);
+			writeAvgMessageLength(out);
 
-			out.println("");
-			out.println("</div>");
+			out.println("<h2>Author statistics</h2>");
+			for (String author : aggregator.getAuthors()) {
+				out.println("<a href='#" + author + "'>" + author + "</a> ");
+			}
+			for (SvnAuthorStats stats : aggregator.getStats()) {
+				out.println("<a id='" + stats.author + "'/>");
+				out.println("<h3>" + stats.author + "</h3>");
+
+				out.println("<p>Author " + stats.author + " was active between " + stats.firstCommit
+						+ " and " + stats.lastCommit + ", and performed " + stats.commits + " commits.</p>");
+
+				writeCommitsPerHour(out, stats);
+				writeFileTypesInCommits(out, stats, 10);
+			};
 
 			out.println("</body>");
 			out.println("</html>");
 		}
+	}
+
+	private void writeCommitsPerAuthor(PrintWriter out) throws IOException {
+		List<KeyValuePair> data = new ArrayList<>();
+		aggregator.getStats().forEach(stats -> data.add(new KeyValuePair(stats.author, stats.commits)));
+		data.sort(KeyValuePair::orderByValueDesc);
+		writeChart(out, "Commit counts per author", data);
+	}
+
+	private void writeAvgCommitSizePerAuthor(PrintWriter out) throws IOException {
+		List<KeyValuePair> data = new ArrayList<>();
+		aggregator.getStats().forEach(stats -> data.add(new KeyValuePair(stats.author, stats.getAverageCommitSize())));
+		data.sort(KeyValuePair::orderByValueDesc);
+		writeChart(out, "Average commit size per author", data);
+	}
+
+	private void writeCommitsPerHour(PrintWriter out) throws IOException {
+		List<KeyValuePair> data = new ArrayList<>();
+		for (int i = 0; i < 24; i++) {
+			data.add(new KeyValuePair(i + ":00", 0));
+		}
+		aggregator.getStats().forEach(stats -> {
+			for (int i = 0; i < 24; i++) {
+				data.get(i).value += stats.commitsPerHour[i];
+			}
+		});
+		writeChart(out, "Commit time distribution", data);
+	}
+
+	private void writeCommitsPerHour(PrintWriter out, SvnAuthorStats stats) throws IOException {
+		List<KeyValuePair> data = new ArrayList<>();
+		for (int i = 0; i < 24; i++) {
+			data.add(new KeyValuePair(i + ":00", stats.commitsPerHour[i]));
+		}
+		writeChart(out, "Commit time distribution for " + stats.author, data);
+	}
+
+	private void writeFileTypesInCommits(PrintWriter out, int limit) throws IOException {
+		Map<String, Integer> fileTypesInCommits = new HashMap<>();
+		aggregator.getStats().forEach(stats -> {
+			stats.fileTypesInCommits.forEach((statsK, statsV) -> {
+				fileTypesInCommits.compute(statsK, (k, v) -> v == null ? 1 : v + statsV);
+			});
+		});
+		List<KeyValuePair> data = new ArrayList<>();
+		fileTypesInCommits.forEach((k, v) -> data.add(new KeyValuePair(k, v)));
+		data.sort(KeyValuePair::orderByValueDesc);
+		writeChart(out, "File types in commits (top " + limit + ")", data.subList(0, Math.min(limit, data.size())));
+	}
+
+	private void writeFileTypesInCommits(PrintWriter out, SvnAuthorStats stats, int limit) throws IOException {
+		List<KeyValuePair> data = new ArrayList<>();
+		stats.fileTypesInCommits.forEach((k, v) -> data.add(new KeyValuePair(k, v)));
+		data.sort(KeyValuePair::orderByValueDesc);
+		writeChart(out, "File types in commits for " + stats.author + " (top " + limit + ")", data.subList(0, Math.min(limit, data.size())));
+	}
+
+	private void writeAvgMessageLength(PrintWriter out) throws IOException {
+		List<KeyValuePair> data = new ArrayList<>();
+		aggregator.getStats().forEach(stats -> data.add(new KeyValuePair(stats.author, stats.getAverageMessageLength())));
+		data.sort(KeyValuePair::orderByValueDesc);
+		writeChart(out, "Average commit message length per author", data);
+	}
+
+	private void writeChart(PrintWriter out, String title, List<KeyValuePair> data) throws IOException {
+		int maxValue = data.stream().mapToInt(kv -> kv.value).max().orElse(0);
+
+		out.println("<h4>" + title + "</h4>");
+		out.println("<div class='chart'>");
+		for (KeyValuePair kv : data) {
+			int width = ((500 * kv.value) / maxValue);
+			out.println("<div style='width: " + width + "px;'>" + kv.key + " (" + kv.value + ")</div>");
+		}
+		out.println("</div>");
 	}
 }

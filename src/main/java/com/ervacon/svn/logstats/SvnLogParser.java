@@ -15,14 +15,15 @@
  */
 package com.ervacon.svn.logstats;
 
+import static java.lang.Integer.parseInt;
+import static java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME;
+import static java.util.Objects.requireNonNull;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
-import static java.lang.Integer.parseInt;
 import java.time.ZonedDateTime;
-import static java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME;
-import static java.util.Objects.requireNonNull;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;

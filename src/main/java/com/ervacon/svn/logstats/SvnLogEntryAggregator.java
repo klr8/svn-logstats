@@ -15,12 +15,12 @@
  */
 package com.ervacon.svn.logstats;
 
-import java.util.Comparator;
+import static java.util.stream.Collectors.toList;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * {@link SvnLogEntryProcessor} that aggregates processed {@link SvnLogEntry log entries} and calculates a number of
@@ -35,29 +35,24 @@ public class SvnLogEntryAggregator implements SvnLogEntryProcessor {
 	@Override
 	public void process(SvnLogEntry logEntry) {
 		statsPerAuthor.putIfAbsent(logEntry.author, new SvnAuthorStats(logEntry.author));
-		SvnAuthorStats stats = statsPerAuthor.get(logEntry.author);
-		stats.commits++;
-		stats.pathsInCommits += logEntry.paths.size();
+		statsPerAuthor.get(logEntry.author).updateWith(logEntry);
 	}
 
 	public int getTotalNumberOfCommits() {
 		return statsPerAuthor.values().stream().mapToInt(stats -> stats.commits).sum();
 	}
 
-	public Set<String> getAuthors() {
-		return statsPerAuthor.keySet();
+	public List<String> getAuthors() {
+		return getStats().stream().map(stats -> stats.author).collect(toList());
 	}
 
-	public List<String> getAuthors(Comparator<SvnAuthorStats> cmp) {
-		return statsPerAuthor.values().stream().sorted(cmp).map((stats) -> stats.author).collect(Collectors.toList());
-	}
-
-	public int getMostCommits() {
-		return statsPerAuthor.values().stream().mapToInt(stats -> stats.commits).max().orElse(0);
+	public List<SvnAuthorStats> getStats() {
+		List<SvnAuthorStats> stats = new ArrayList(statsPerAuthor.values());
+		stats.sort(SvnAuthorStats::sortByAuthorNameAsc);
+		return stats;
 	}
 
 	public SvnAuthorStats getStatsFor(String author) {
 		return statsPerAuthor.getOrDefault(author, new SvnAuthorStats(author));
 	}
-
 }
