@@ -46,6 +46,7 @@ public class SvnLogEntryAggregator implements SvnLogEntryProcessor {
 		return getStats().stream().map(stats -> stats.author).collect(toList());
 	}
 
+	@SuppressWarnings("unchecked")
 	public List<SvnAuthorStats> getStats() {
 		List<SvnAuthorStats> stats = new ArrayList(statsPerAuthor.values());
 		stats.sort(SvnAuthorStats::sortByAuthorNameAsc);
