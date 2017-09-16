@@ -6,27 +6,27 @@
 	<version>1.0.0-SNAPSHOT</version>
 
 	<url>https://github.com/klr8/svn-logstats</url>
-	
+
 	<description>
-	    Simple and beautiful Subversion log file statistics.
+		Simple and beautiful Subversion log file statistics.
 	</description>
 	
 	<developers>
-	    <developer>
-		<id>klr8</id>
-		<name>Erwin Vervaet</name>
-	    </developer>
-	    <developer>
-		<id>nienkevdw</id>
-		<name>Nienke Vanderwegen</name>
-	    </developer>
+		<developer>
+			<id>klr8</id>
+			<name>Erwin Vervaet</name>
+		</developer>
+		<developer>
+			<id>nienkevdw</id>
+			<name>Nienke Vanderwegen</name>
+		</developer>
 	</developers>
 	
 	<inceptionYear>2017</inceptionYear>
 	
 	<issueManagement>
-	    <system>GitHub</system>
-	    <url>https://github.com/klr8/svn-logstats/issues</url>
+		<system>GitHub</system>
+		<url>https://github.com/klr8/svn-logstats/issues</url>
 	</issueManagement>
 	
 	<licenses>
@@ -38,9 +38,9 @@
 	</licenses>
 	
 	<scm>
-	    <connection>scm:svn:https://github.com/klr8/svn-logstats.git/trunk</connection>
-	    <developerConnection>scm:svn:https://github.com/klr8/svn-logstats.git/trunk</developerConnection>
-	    <url>https://github.com/klr8/svn-logstats</url>
+		<connection>scm:svn:https://github.com/klr8/svn-logstats.git/trunk</connection>
+		<developerConnection>scm:svn:https://github.com/klr8/svn-logstats.git/trunk</developerConnection>
+		<url>https://github.com/klr8/svn-logstats</url>
 	</scm>
 
 	<properties>
