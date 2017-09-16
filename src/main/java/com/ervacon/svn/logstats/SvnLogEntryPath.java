@@ -24,7 +24,7 @@ public class SvnLogEntryPath {
 
 	public PathAction action;
 	public PathKind kind;
-	public String path;
+	public String path; // simple String to avoid problems interpreting paths on file systems we might not know about
 
 	public static enum PathAction {
 		M, // modified
