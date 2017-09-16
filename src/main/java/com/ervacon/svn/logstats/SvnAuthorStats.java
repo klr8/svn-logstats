@@ -46,6 +46,10 @@ public class SvnAuthorStats {
 	}
 
 	public void updateWith(SvnLogEntry logEntry) {
+		if (!author.equals(logEntry.author)) {
+			throw new IllegalArgumentException("Expected log entry for author " + author);
+		}
+
 		commits++;
 		commitsPerHour[logEntry.date.get(ChronoField.HOUR_OF_DAY)]++;
 
