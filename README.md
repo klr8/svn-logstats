@@ -1,5 +1,7 @@
 # svn-logstats
-Simple and beautiful Subversion log file statistics
+Simple and beautiful Subversion log file statistics.
+
+Svn-logstats is still under development. Check back soon for a 1.0.0 release!
 
 ## License
 The svn-logstats are released under version 2.0 of the [Apache License][].
