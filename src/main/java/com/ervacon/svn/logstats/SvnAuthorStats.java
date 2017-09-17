@@ -20,10 +20,8 @@ import static com.ervacon.svn.logstats.Util.getFilenameExtension;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoField;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * Aggregated statistics for a specific author found in the Subversion log.
@@ -55,15 +53,13 @@ public class SvnAuthorStats {
 
 		pathsInCommits += logEntry.paths.size();
 
-		Set<String> extensionsInCommit = new HashSet<>();
 		logEntry.paths.forEach(path -> {
 			String extension = getFilenameExtension(path.path);
 			if (extension == null) {
 				extension = "other";
 			}
-			extensionsInCommit.add(extension);
+			fileTypesInCommits.compute(extension, (k, v) -> v == null ? 1 : v + 1);
 		});
-		extensionsInCommit.forEach(extension -> fileTypesInCommits.compute(extension, (k, v) -> v == null ? 1 : v + 1));
 
 		logEntry.paths.forEach(path -> actionCounts.compute(path.action, (k, v) -> v == null ? 1 : v + 1));
 
